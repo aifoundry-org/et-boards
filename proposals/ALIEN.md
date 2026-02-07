@@ -1,8 +1,8 @@
 # Alien Board
 
 Alien Board is an open source single-board-computer design around
-Esperanto ET-SoC-1 that can support stand-alone operation,
-including remote operation over WiFi/Ethernet and desktop-style operation.
+ET-SoC-1 that can support stand-alone operation, including remote
+operation over WiFi/Ethernet and desktop-style operation.
 
 ```mermaid
 flowchart LR
@@ -61,7 +61,7 @@ flowchart LR
 
 ## Block Overview
 
-Alien Board is built around the Esperanto **ET-SoC-1** device, exposing its PCIe Gen4 x8 interface and low-speed I/O into a flexible high-speed expansion platform.
+Alien Board is built around the **ET-SoC-1** device, exposing its PCIe Gen4 x8 interface and low-speed I/O into a flexible high-speed expansion platform.
 
 ### Compute and Memory
 
