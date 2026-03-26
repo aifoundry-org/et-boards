@@ -1,0 +1,194 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# Copyright (c) 2025 Ainekko, Co.
+# SPDX-License-Identifier: Apache-2.0
+#------------------------------------------------------------------------------s
+
+set -xe
+
+##############
+#Sign Images
+##############
+
+# SP BL1
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N SP_BL1 \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_bl1.img \
+ @SP_BL1_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+# SP BL2
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N SP_BL2 \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_bl2.img \
+ @SP_BL2_PROD_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+# SP BL2 TF
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N SP_BL2 \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_bl2_tf.img \
+ @SP_BL2_TF_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+
+# SP BL2 LINUX-MODE
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N SP_BL2 \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_bl2_linux.img \
+ @SP_BL2_LINUX_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+
+
+# Various PCIE Boot Configurations
+
+# Sign PCI-E Boot config Link Tranining Bypass
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PCIE_PHY_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pcie_config_bypass_link_train.img \
+ @PCIE_BOOT_CONFIG_DIR@/pcie_config_bypass_link_train.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# Sign PCI-E config default PHY FW first established speed
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PCIE_PHY_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pcie_config_def_phy_fw_any_speed.img \
+ @PCIE_BOOT_CONFIG_DIR@/pcie_config_def_phy_fw_any_speed.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# Sign PCI-E config default PHY FW Gen 4
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PCIE_PHY_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pcie_config_def_phy_fw_gen4.img \
+ @PCIE_BOOT_CONFIG_DIR@/pcie_config_def_phy_fw_gen4.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# Sign PCI-E config Phy FW override
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PCIE_PHY_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pcie_config_override_phy_fw.img \
+ @PCIE_BOOT_CONFIG_DIR@/pcie_config_override_phy_fw.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# MACHINE_MINION
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N MACHINE_MINION \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_machine_minion.img \
+ @MACHINE_MINION_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+# MASTER_MINION
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N MASTER_MINION \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_master_minion.img \
+ @MASTER_MINION_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+# WORKER_MINION
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N WORKER_MINION \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_worker_minion.img \
+ @WORKER_MINION_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+# MASTER_MINION_TF
+@SIGN_TOOLS_DIR@/esperanto_sign_elf -N MASTER_MINION \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_master_minion_tf.img \
+ @MASTER_MINION_TF_ELF@ \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0
+
+#Sign PMIC firmware
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PMIC_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pmic_s0_fw.img \
+ @PMIC_FW_DIR@/pmic_slot0_image_debug.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N PMIC_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_pmic_s1_fw.img \
+ @PMIC_FW_DIR@/pmic_slot1_image_debug.bin \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# Sign DDR training firmware
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_1d_i.img \
+ @DDR_FW_DIR@/lpddr4x_train_1d_i.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_800_1d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_800_1d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_933_1d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_933_1d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_1067_1d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_1067_1d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_2d_i.img \
+ @DDR_FW_DIR@/lpddr4x_train_2d_i.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_800_2d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_800_2d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_933_2d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_933_2d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N DRAM_CONTROLLER_FW \
+ @CMAKE_CURRENT_BINARY_DIR@/signed_lpddr4x_train_1067_2d_d.img \
+ @DDR_FW_DIR@/lpddr4x_train_1067_2d_d.img \
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+# Sign ASSET config data
+@SIGN_TOOLS_DIR@/esperanto_sign_raw -N ASSET_CONFIG\
+ @CMAKE_CURRENT_BINARY_DIR@/signed_asset_config.img \
+ @ASSET_CONFIG_DIR@/asset-config-data.img\
+ /dev/null \
+ /dev/null \
+ SHA2-256 0 0 0 00000000000000000000000000000000
+
+

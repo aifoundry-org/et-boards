@@ -1,0 +1,7 @@
+bin/
+build*
+.vscode
+*.epp
+*.log
+*.zip
+scripts/__pycache__/

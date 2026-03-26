@@ -1,0 +1,9 @@
+default_image: convoke/ubuntu-22.04-et-sw-platform
+default_reg: docker-sw-team.sc-artifactory1.esperanto.ai
+
+registries:
+  - docker-sw-team.sc-artifactory1.esperanto.ai
+
+images:
+  convoke/ubuntu-22.04-et-sw-platform:
+    tag: '0.0.8'

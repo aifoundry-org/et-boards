@@ -1,0 +1,16 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2025 Ainekko, Co.
+# SPDX-License-Identifier: Apache-2.0
+#------------------------------------------------------------------------------
+
+@PACKAGE_INIT@
+
+set_and_check(ESPERANTO_CRYPTO_API_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
+
+get_filename_component(ESPERANTO_CRYPTO_API_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+include(CMakeFindDependencyMacro)
+find_dependency(signedImageFormat REQUIRED)
+find_dependency(OpenSSL REQUIRED COMPONENTS Crypto SSL)
+
+include("${ESPERANTO_CRYPTO_API_CMAKE_DIR}/EsperantoCryptoAPITargets.cmake")

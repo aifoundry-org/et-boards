@@ -1,0 +1,13 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2025 Ainekko, Co.
+# SPDX-License-Identifier: Apache-2.0
+#------------------------------------------------------------------------------
+
+@PACKAGE_INIT@
+
+set_and_check(ESPERANTO_PMIC_SLOT0_IMAGE      "@PACKAGE_LIB_INSTALL_DIR@/pmic-fw/pmic_slot0_image_@BUILD_TYPE_LOWER@.bin")
+set_and_check(ESPERANTO_PMIC_SLOT1_IMAGE      "@PACKAGE_LIB_INSTALL_DIR@/pmic-fw/pmic_slot1_image_@BUILD_TYPE_LOWER@.bin")
+set_and_check(ESPERANTO_PMIC_STANDALONE_IMAGE "@PACKAGE_LIB_INSTALL_DIR@/pmic-fw/pmic_standalone_image_@BUILD_TYPE_LOWER@.bin")
+
+include(${CMAKE_CURRENT_LIST_DIR}/EsperantoPMICTargets.cmake)
+check_required_components(EsperantoPMIC)

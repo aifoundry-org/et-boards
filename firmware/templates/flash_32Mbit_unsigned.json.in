@@ -1,0 +1,167 @@
+{
+    "image" : {
+        "image_size" : 4096,
+        "partitions" : [
+            {
+                "partition_size" : 2048,
+                "priority" : 0,
+                "attempted_boot_count" : 17,
+                "completed_boot_count" : 18,
+                "regions" : [
+                    {
+                        "id" : "PRIORITY_DESIGNATOR",
+                        "size" : 4
+                    },
+                    {
+                        "id" : "BOOT_COUNTERS",
+                        "size" : 4
+                    },
+                    {
+                        "id" : "CONFIGURATION_DATA",
+                        "file" : "@ASSET_CONFIG_IMAGE@"
+                    },
+                    {
+                        "id" : "PCIE_CONFIG",
+                        "file" : "@PCIE_CONFIG_IMAGE@"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1d_i.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_800MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_800_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_933MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_933_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_1067MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1067_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_2d_i.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_800MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_800_2d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_933MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_933_2d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_1067MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1067_2d_d.img"
+                    },
+                    {
+                        "id" : "SP_BL1",
+                        "file" : "@BL1_IMAGE@"
+                    },
+                    {
+                        "id" : "SP_BL2",
+                        "file" : "@BL2_IMAGE@"
+                    },
+                    {
+                        "id" : "MACHINE_MINION",
+                        "file" : "@MACHINE_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "MASTER_MINION",
+                        "file" : "@MASTER_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "WORKER_MINION",
+                        "file" : "@WORKER_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "PMIC_FW_S0",
+                        "file" : "@PMIC_IMAGE_S0@"
+                    },
+                    {
+                        "id" : "PMIC_FW_S1",
+                        "file" : "@PMIC_IMAGE_S1@"
+                    }
+                ]
+            },
+            {
+                "partition_size" : 2048,
+                "priority" : 3,
+                "attempted_boot_count" : 27,
+                "completed_boot_count" : 26,
+                "regions" : [
+                    {
+                        "id" : "CONFIGURATION_DATA",
+                        "file" : "@ASSET_CONFIG_IMAGE@"
+                    },
+                    {
+                        "id" : "SP_BL1",
+                        "file" : "@BL1_IMAGE@"
+                    },
+                    {
+                        "id" : "PCIE_CONFIG",
+                        "file" : "@PCIE_CONFIG_IMAGE@"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1d_i.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_800MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_800_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_933MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_933_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_PAYLOAD_1067MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1067_1d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_2d_i.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_800MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_800_2d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_933MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_933_2d_d.img"
+                    },
+                    {
+                        "id" : "DRAM_TRAINING_2D_PAYLOAD_1067MHZ",
+                        "file" : "@SIGNED_FW@/signed_lpddr4x_train_1067_2d_d.img"
+                    },
+                    {
+                        "id" : "SP_BL2",
+                        "file" : "@BL2_IMAGE@"
+                    },
+                    {
+                        "id" : "MACHINE_MINION",
+                        "file" : "@MACHINE_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "MASTER_MINION",
+                        "file" : "@MASTER_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "WORKER_MINION",
+                        "file" : "@WORKER_MIN_IMAGE@"
+                    },
+                    {
+                        "id" : "PMIC_FW_S0",
+                        "file" : "@PMIC_IMAGE_S0@"
+                    },
+                    {
+                        "id" : "PMIC_FW_S1",
+                        "file" : "@PMIC_IMAGE_S1@"
+                    }
+                ]
+            }
+        ]
+    }
+}
