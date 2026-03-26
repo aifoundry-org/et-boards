@@ -1,0 +1,75 @@
+/***********************************************************************
+*
+* Copyright (c) 2025 Ainekko, Co.
+* SPDX-License-Identifier: Apache-2.0
+*
+************************************************************************/
+
+/***********************************************************************/
+/*! \file LTM4680.c
+    \brief C file for LTM4680 driver
+*/
+/***********************************************************************/
+
+#include "boardchipinfo.h"
+#include "pmbus.h"
+#include "LTM4680.h"
+
+void LTM4680_init(t_cprf *pcprf)
+{
+    SETREGVAL_PMBUS(LTM4680, OPERATION, 0x00) // disable  0x01
+
+    // set default values in case they aren't correct
+    SETREGVAL_PMBUS(LTM4680, VOUT_MARGIN_HIGH, 0x99A)      // 			0x25
+    SETREGVAL_PMBUS(LTM4680, VOUT_MARGIN_LOW, 0x998)       // 			0x26
+    SETREGVAL_PMBUS(LTM4680, VOUT_TRANSITION_RATE, 0x8042) // 			0x27
+    SETREGVAL_PMBUS(LTM4680, VIN_ON, 0xD130)               // 4.75V 	0x35
+    SETREGVAL_PMBUS(LTM4680, VIN_OFF, 0xD120)              // 4.5V 	0x36
+    SETREGVAL_PMBUS(LTM4680, VOUT_OV_FAULT_LIMIT, 0x119A)  // 1.1V 	0x40
+    SETREGVAL_PMBUS(LTM4680, VOUT_OV_FAULT_RESPONSE, 0xB8) // shutdown 0x41
+    SETREGVAL_PMBUS(LTM4680, VOUT_OV_WARN_LIMIT, 0x119A)   // 1.1V 	0x42
+    SETREGVAL_PMBUS(LTM4680, VOUT_UV_FAULT_RESPONSE, 0xB8) // shutdown 0x45
+    SETREGVAL_PMBUS(LTM4680, IOUT_OC_FAULT_LIMIT, 0xE370)  // 55A      0x46
+    SETREGVAL_PMBUS(LTM4680, IOUT_OC_FAULT_RESPONSE, 0xB8) // shutdown 0x47
+    SETREGVAL_PMBUS(LTM4680, IOUT_OC_WARN_LIMIT, 0xE320)   // 50A      0x4A
+    SETREGVAL_PMBUS(LTM4680, OT_FAULT_LIMIT, 0xF200)       // 128 degC 0x4F
+    SETREGVAL_PMBUS(LTM4680, OT_FAULT_RESPONSE, 0xB8)      // shutdown 0x50
+    SETREGVAL_PMBUS(LTM4680, OT_WARN_LIMIT, 0xF200)        // 128 degC 0x51
+    SETREGVAL_PMBUS(LTM4680, UT_FAULT_LIMIT, 0xE530)       // -45 degC 0x53
+    SETREGVAL_PMBUS(LTM4680, UT_FAULT_RESPONSE, 0xB8)      // shutdown 0x54
+    SETREGVAL_PMBUS(LTM4680, VIN_OV_FAULT_LIMIT, 0xD3E0)   // 15.5V 	0x55
+    SETREGVAL_PMBUS(LTM4680, VIN_OV_FAULT_RESPONSE, 0xB8)  // shutdown 0x56
+    SETREGVAL_PMBUS(LTM4680, VIN_UV_WARN_LIMIT, 0xD2B0)    // 10.75V 	0x58
+    SETREGVAL_PMBUS(LTM4680, IIN_OC_WARN_LIMIT, 0xC300)    // 3A 		0x5D
+    SETREGVAL_PMBUS(LTM4680, TON_DELAY, 0x8000)            // 0 ms 	0x60
+    SETREGVAL_PMBUS(LTM4680, TON_MAX_FAULT_RESPONSE, 0xB8) // shutdown 0x63
+    SETREGVAL_PMBUS(LTM4680, TOFF_DELAY, 0x8000)           // 0 ms 	0x64
+    SETREGVAL_PMBUS(LTM4680, TOFF_FALL, 0xC300)            // 3 ms 	0x65
+    SETREGVAL_PMBUS(LTM4680, TOFF_MAX_WARN_LIMIT, 0x8000)  // 0 ms 	0x66
+    SETREGVAL_MFR(LTM4680, MFR_CHAN_CONFIG, 0xD1, )        // 			0xD0
+    SETREGVAL_MFR(LTM4680, MFR_FAULT_PROPAGATE, 0x6993, )  // 			0xD2
+    SETREGVAL_MFR(LTM4680, MFR_PWM_MODE, 0xC7, )           // High Current mode 	0xD4
+    SETREGVAL_MFR(LTM4680, MFR_FAULT_RESPONSE, 0xC0, )     // 			0xD5
+    SETREGVAL_MFR(LTM4680, MFR_ADC_CONTROL, 0x00, )        // 			0xD8
+    SETREGVAL_MFR(LTM4680, MFR_RETRY_DELAY, 0xF3E8, )      // 250ms 	0xDB
+    SETREGVAL_MFR(LTM4680, MFR_RESTART_DELAY, 0xF258, )    // 150 ms 	0xDC
+    SETREGVAL_MFR(LTM4680, MFR_PWM_CONFIG, 0x10, )         //          0xF5
+    SETREGVAL_MFR(LTM4680, MFR_IOUT_CAL_GAIN_TC, 0x0ED8, ) // 3800 ppm/degC 0xF6
+    // can't write to this    SETREGVAL( MFR_ICHIP_CAL_GAIN, 0x03E8 ) 	// 1000 mOhm 0xF7
+    SETREGVAL_MFR(LTM4680, MFR_TEMP_1_GAIN, 0x3FAE, )     // 0.995 	0xF8
+    SETREGVAL_MFR(LTM4680, MFR_TEMP_1_OFFSET, 0x8000, )   // 0.0 		0xF9
+    SETREGVAL_MFR(LTM4680, MFR_CONFIG_ALL, 0x23, )        // 0xD1  set clock stretching
+    SETREGVAL_MFR(LTM4680, MFR_PWM_COMP, 0x59, )          // 0xD3  non default compensation
+    SETREGVAL_MFR(LTM4680, MFR_IIN_CAL_GAIN, 0xCA00, )    // 0xE8  4 mOhm Isense
+    SETREGVAL_PMBUS(LTM4680, CLEAR_FAULT, 0)              // 0x03  0 is dummy byte, this write has no data
+    SETREGVAL_PMBUS(LTM4680, TON_MAX_FAULT_LIMIT, 0xD280) // 0x62  10 ms
+    SETREGVAL_PMBUS(LTM4680, TON_RISE, 0xBA00)            // 0x61  1 ms
+    SETREGVAL_PMBUS(LTM4680, IOUT_OC_WARN_LIMIT, 0xE168)  // 0x4A  22.5A
+    SETREGVAL_PMBUS(LTM4680, IOUT_OC_FAULT_LIMIT, 0xE190) // 0x4F  25A
+    SETREGVAL_PMBUS(LTM4680, VOUT_UV_WARN_LIMIT, 0x800)   // 0x43  500 mV
+    SETREGVAL_PMBUS(LTM4680, VOUT_UV_FAULT_LIMIT, 0x666)  // 0x44  400 mV
+    SETREGVAL_PMBUS(LTM4680, VOUT_MAX, 0x1333)            // 0x24  1200 mV
+    SETREGVAL_PMBUS(LTM4680, FREQUENCY_SWITCH, 0xFABC)    // 0x33  350 MHz
+    SETCHKREGVAL_PMBUS(LTM4680, VOUT_COMMAND, 0xB35)      // Format: VOUT= 0xB35 x 2^-12 = 700 mV
+    SETREGVAL_PMBUS(LTM4680, OPERATION, 0x80)             // 0x01  reenable
+}

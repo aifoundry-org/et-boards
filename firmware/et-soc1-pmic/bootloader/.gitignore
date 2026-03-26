@@ -1,0 +1,6 @@
+.vs/
+*.log
+*.jdebug.user
+*.config
+Debug/*
+

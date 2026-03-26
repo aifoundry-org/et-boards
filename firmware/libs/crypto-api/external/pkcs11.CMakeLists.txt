@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2025 Ainekko, Co.
+# SPDX-License-Identifier: Apache-2.0
+#------------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.5)
+
+# simplify variable expansion
+cmake_policy(SET CMP0053 NEW)
+cmake_policy(SET CMP0010 NEW)
+
+project(pckcs11 NONE)
+
+set(GIT_CONFIG_OPTIONS "" CACHE STRING "Git configuration options to pass when cloning the project")
+
+include(ExternalProject)
+
+ExternalProject_Add(pkcs11
+#   PREFIX pkcs11
+  GIT_REPOSITORY https://github.com/oasis-tcs/pkcs11.git
+  GIT_TAG d8240e4497c26
+  GIT_CONFIG ${GIT_CONFIG_OPTIONS}
+  SOURCE_DIR src
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+  BUILD_ALWAYS 1
+  )

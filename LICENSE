@@ -199,3 +199,9 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+All the source files here are licensed under the Apache License Version 2.0
+(see licensing terms above) with the exception of:
+  * tools/signing-tools/elf.h licensed under LGPLv2.1
+  * et-soc1-pmic/common/Utils/src/printf-stdarg.c licensed under LGPLv2
+  * et-soc1-pmic/common/ThirdParty/FreeRTOSv10.3.1/** licensed under MIT

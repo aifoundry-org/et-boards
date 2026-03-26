@@ -1,0 +1,290 @@
+include:
+  - project: esperantotech/software/gitlab-ci-common
+    ref: 9e27d5abc3e4538cf5ee705d0263ea3d415e6ef1
+    file:
+      - rules/generic-workflow-conan.yaml
+      - /pods/nano-pod.yaml
+      - pods/medium-pod.yaml
+      - /pods/large-pod.yaml
+      - /jobs/generic-k8s-job.yaml
+      - /rules/exec_maybe_interactively.yaml
+      - /jobs/check-top-of-master.yaml
+  - project: esperantotech/software/gitlab-ci-common
+    ref: 1be8a1ec31da665910e1b2b193fcfa1d05866299
+    file:
+      - jobs/sw-platform-trigger-template.yaml
+  - project: esperantotech/software/gitlab-ci-common
+    ref: master
+    file:
+      - jobs/conan-jobs.yaml
+  - project: 'esperantotech/software/sw-platform'
+    ref: develop/system-sw
+    file:
+      - 'gitlab-ci/system-sw/misc/verify-merge-request.yaml'
+
+stages:
+  - .pre
+  - generate_build
+  - build
+  - test_phase_2
+  - deploy
+
+default:
+  interruptible: true
+  image:
+    name: docker-sw-team.sc-artifactory1.esperanto.ai/convoke/ubuntu-22.04-et-sw-platform:0.0.12
+    entrypoint: [""]
+
+variables:
+  # These two variables are consumed by the jobs from /jobs/sw-platform-trigger-template.yaml
+  SW_PLATFORM_BRANCH: develop/system-sw
+  PIPELINE_CI_SUBPROJECT: et-soc1-pmic
+
+# Only run job in these cases:
+# - if it's a tag pipeline
+.release_job:
+  rules:
+    - &release_job_rule
+      if: $CI_COMMIT_TAG
+
+# Only run job in these cases:
+# - if it's a tag pipeline
+# - if there is a commit pushed or merged to the default branch (pre-release)
+# - if there is a MR open (pre-release, unstable)
+.release_or_development_job:
+  rules:
+    - &release_or_development_job_rule
+      if: $CI_COMMIT_TAG || ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || ($CI_PIPELINE_SOURCE == "merge_request_event")
+
+# Only run job in these cases:
+# - if there is a MR open
+.development_job:
+  rules:
+    - &development_job_rule
+      if: ($CI_PIPELINE_SOURCE == "merge_request_event") && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH)
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+verify_project_changes:
+  extends:
+    - .template_job
+    - .pod_nano
+    - .verify_merge_request
+  stage: .pre
+  rules:
+    - *development_job_rule
+  variables:
+    PROJ_VER_FILE_NAME: CMakeLists.txt
+
+clang-format:
+  extends:
+    - .template_job
+    - .pod_nano
+  image: docker-sw-team.sc-artifactory1.esperanto.ai/convoke/ubuntu-22.04-et-sw-platform:0.0.12
+  stage: .pre
+  rules:
+    - *development_job_rule
+  variables:
+    CMD_SCRIPT: |
+      git fetch origin master
+      git clang-format --style file --diff origin/master --extensions c,h
+      git clang-format --style file --diff origin/master --extensions c,h | grep -q -e "clang-format did not modify any files$" -e "^no modified files to format$"
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+create-sw-platform-branch:
+  extends: .create-sw-platform-branch
+  stage: generate_build
+  rules:
+    - *development_job_rule
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+create-sw-platform-trigger:
+  extends: .create-sw-platform-trigger
+  stage: build
+  rules:
+    - *development_job_rule
+  needs:
+    - create-sw-platform-branch
+
+flash_image_debug:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: build
+  rules:
+    - *release_or_development_job_rule
+  variables:
+    TIMEOUT: 1h
+    CMD_CONFIG_BUILD: |
+      mkdir -p build
+    CMD_BUILD: |
+      make full-pmic-flash-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Debug SLOT=0
+  artifacts:
+    expire_in: 4 hour
+    paths:
+      - pmic_flash_image_debug.bin
+
+flash_image_release:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: build
+  rules:
+    - *release_or_development_job_rule
+  variables:
+    TIMEOUT: 1h
+    CMD_CONFIG_BUILD: |
+      mkdir -p build
+    CMD_BUILD: |
+      make full-pmic-flash-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Release SLOT=0
+  artifacts:
+    expire_in: 4 hour
+    paths:
+      - pmic_flash_image_release.bin
+
+slot_image_debug:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: build
+  rules:
+    - *release_or_development_job_rule
+  variables:
+    TIMEOUT: 1h
+    CMD_CONFIG_BUILD: |
+      mkdir -p build
+    CMD_BUILD: |
+      make clean-build pmic-slot-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Debug SLOT=0
+      make clean-build pmic-slot-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Debug SLOT=1
+  artifacts:
+    expire_in: 4 hour
+    paths:
+      - pmic_slot0_image_debug.bin
+      - pmic_slot1_image_debug.bin
+
+slot_image_release:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: build
+  rules:
+    - *release_or_development_job_rule
+  variables:
+    TIMEOUT: 1h
+    CMD_CONFIG_BUILD: |
+      mkdir -p build
+    CMD_BUILD: |
+      make clean-build pmic-slot-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Release SLOT=0
+      make clean-build pmic-slot-image BUILD_DIR=build IMAGE_DIR=$(pwd) BUILD_TYPE=Release SLOT=1
+  artifacts:
+    expire_in: 4 hour
+    paths:
+      - pmic_slot0_image_release.bin
+      - pmic_slot1_image_release.bin
+
+check_debug_vs_release_size:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: build
+  rules:
+    - *release_or_development_job_rule
+  variables:
+    TIMEOUT: 1h
+    CMD_SCRIPT: |
+      make runtime BUILD_DIR=build-release  BUILD_TYPE=Release
+      cp build-release/runtime/runtime.bin runtime_release.bin
+      make runtime BUILD_DIR=build-debug  BUILD_TYPE=Debug
+      cp build-debug/runtime/runtime.bin runtime_debug.bin
+      DBG_SIZE=`stat -c'%s' runtime_debug.bin`;
+      REL_SIZE=`stat -c'%s' runtime_release.bin`;
+      echo "Debug size $${DBG_SIZE}   Release img size $${REL_SIZE}";
+      if [[ $$REL_SIZE -ge $$DBG_SIZE ]]; then
+        echo "Error: runtime release image size is not less then debug image";
+        exit 1;
+      fi
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+tests:integration-repo:
+  extends: .meta-trigger
+  stage: test_phase_2
+  rules:
+    - *development_job_rule
+  trigger:
+    strategy: depend
+    include:
+      - artifact: generated-trigger-job.yaml
+        job: create-sw-platform-trigger
+
+
+# quality:sonarqube-check:
+#   stage: test_phase_1
+#   extends:
+#     - .template_sonarqube_conan_job
+#     - .pod_medium
+#     - .template-conan-linux-ubuntu22.04-gcc11
+#   needs:
+#     - slot_image_release
+#   rules:
+#     - *release_or_development_job_rule
+#   script:
+#       - conan lock create conanfile.py -pr:b=default -pr:h=baremetal-rv64-gcc8.2-release --build missing --lockfile=deps_base.lock --lockfile-out=Release.lock
+#       - conan install . --lockfile=Release.lock --build=missing -g VirtualRunEnv
+#       - cmake -S . -B build/Release -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja 
+#       - source build/Release/generators/conanrun.sh
+#       - cp ${CI_PROJECT_DIR}/build/Release/compile_commands.json .
+#       - sonar-scanner -Dsonar.cfamily.threads=${KUBERNETES_CPU_REQUEST}
+
+###############################################################################
+###############################################################################
+###############################################################################
+
+deploy_image:
+  extends:
+    - .template_job
+    - .pod_nano
+  stage: deploy
+  rules:
+    - *release_job_rule
+  needs:
+    - flash_image_release
+    - flash_image_debug
+    - check_debug_vs_release_size
+  variables:
+    TIMEOUT: 1h
+    CMD_PUSH_ARTIFACTS: |
+      set -e
+      ver_dir=common/Config/inc
+      major=$(grep -Po '#define\s+RT_FW_VERSION_H\s+\K\d+' $${ver_dir}/version.h)
+      minor=$(grep -Po '#define\s+RT_FW_VERSION_M\s+\K\d+' $${ver_dir}/version.h)
+      patch=$(grep -Po '#define\s+RT_FW_VERSION_L\s+\K\d+' $${ver_dir}/version.h)
+      version=$${major}.$${minor}.$${patch}
+      flash_image_release_name=pmic_flash_fw_release_$${version}.bin
+      flash_image_debug_name=pmic_flash_fw_debug_$${version}.bin
+      artifactory_target=pmic-fw-release
+      [ -s pmic_flash_image_release.bin ]
+      [ -s pmic_flash_image_debug.bin ]
+      mv pmic_flash_image_release.bin $${flash_image_release_name}
+      mv pmic_flash_image_debug.bin $${flash_image_debug_name}
+      # Generate the build name
+      BUILD_NAME="EsperantoPMIC"
+      # Collect environment variables
+      jfrog rt bce $${BUILD_NAME} $${CI_JOB_ID}
+      # Upload CI artifacts
+      echo "Uploading http://sc-artifactory1.esperanto.ai/artifactory/$${artifactory_target}/$${flash_image_release_name}"
+      jfrog rt u "$${flash_image_release_name}" "$${artifactory_target}" --build-name $${BUILD_NAME} --build-number $${CI_JOB_ID}
+      echo "Uploading http://sc-artifactory1.esperanto.ai/artifactory/$${artifactory_target}/$${flash_image_debug_name}"
+      jfrog rt u "$${flash_image_debug_name}" "$${artifactory_target}" --build-name $${BUILD_NAME} --build-number $${CI_JOB_ID}
+      # Publish build info
+      jfrog rt bp $${BUILD_NAME} $${CI_JOB_ID} --build-url="$${CI_SERVER_URL}"
